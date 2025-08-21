@@ -5,16 +5,10 @@ import cvzone
 import math
 from sort import *
 
-# ----------------------------
-# Inputs
-# ----------------------------
-VIDEO_PATH = "cars.mp4"
-MASK_PATH = "mask-950x480.png"     # White region = keep, black = ignore
-#GRAPHICS_PATH = "graphics.png"     # Optional PNG with alpha for HUD overlay
 
-# ----------------------------
-# Load video
-# ----------------------------
+VIDEO_PATH = "cars.mp4"
+MASK_PATH = "mask-950x480.png"     
+
 cap = cv2.VideoCapture(VIDEO_PATH)
 if not cap.isOpened():
     print(f"Error: Could not open video: {VIDEO_PATH}")
@@ -28,12 +22,8 @@ if not ok or first_frame is None:
 
 H, W = first_frame.shape[:2]
 
-# ----------------------------
-# Load YOLOv8 model
-# ----------------------------
 model = YOLO("yolov8l.pt")
 
-# COCO class names for YOLOv8
 classNames = [
     "person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train",
     "truck", "boat", "traffic light", "fire hydrant", "stop sign",
@@ -50,13 +40,11 @@ classNames = [
     "scissors", "teddy bear", "hair drier", "toothbrush"
 ]
 
-# ----------------------------
-# Prepare mask (resize once, make binary)
-# ----------------------------
+
 mask = cv2.imread(MASK_PATH, cv2.IMREAD_UNCHANGED)
 if mask is None:
     print(f"Warning: Mask not found at '{MASK_PATH}'. Using full frame.")
-    mask_bin = np.ones((H, W), dtype=np.uint8) * 255  # keep everything
+    mask_bin = np.ones((H, W), dtype=np.uint8) * 255  
 else:
     # Resize mask to frame size
     mask = cv2.resize(mask, (W, H))
@@ -75,21 +63,13 @@ else:
     # Binarize (assume white region should be kept)
     _, mask_bin = cv2.threshold(mask_gray, 1, 255, cv2.THRESH_BINARY)
 
-# ----------------------------
-# Tracking (SORT)
-# ----------------------------
 tracker = Sort(max_age=20, min_hits=3, iou_threshold=0.3)
 
-# Counting line: [x1, y1, x2, y2]
 limits = [400, 297, 673, 297]
 totalCount = []
 
-# Restart video from beginning since we consumed one frame
 cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
-# ----------------------------
-# Processing loop
-# ----------------------------
 while True:
     success, img = cap.read()
     if not success or img is None:
@@ -144,7 +124,7 @@ while True:
         x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
         w, h = x2 - x1, y2 - y1
 
-        # Fancy rectangle and ID label
+        # rectangle and ID label
         cvzone.cornerRect(img, (x1, y1, w, h), l=9, rt=2, colorR=(255, 0, 255))
         cvzone.putTextRect(img, f'{int(track_id)}', (max(0, x1), max(35, y1)),
                            scale=2, thickness=3, offset=10)
@@ -167,9 +147,7 @@ while True:
 
     # Display
     cv2.imshow("Image", img)
-    # cv2.imshow("ImageRegion", imgRegion)  # Uncomment to see masked input
 
-    # Exit on 'q'
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
