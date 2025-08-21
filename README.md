@@ -15,3 +15,10 @@ The combination of YOLOv8 and SORT ensured a balance of speed, robustness, and r
 The developed system successfully demonstrated **accurate vehicle counting**, even under difficult conditions such as occlusion and overlapping cars. By leveraging YOLOv8 for real-time detection and SORT for unique ID-based tracking, the system minimized repeated counting errors and improved consistency.  
 
 The approach provided a **scalable, cost-effective, and reliable solution** for traffic monitoring, supporting smarter infrastructure planning and safer road networks.
+
+## Requirements
+1. opencv==4.2.0
+2. dlib==19.17.0
+
+### Demo
+![Alt Text](Counter_REC.mp4)
